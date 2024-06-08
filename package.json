@@ -36,5 +36,10 @@
     "awesome-typescript-loader": "^5.2.1",
     "source-map-loader": "^0.2.4",
     "typescript": "^3.2.4"
-  }
+  },
+  "description": "Starter repo for task 2 of JPMC's Forage program",
+  "main": "index.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }
