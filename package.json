@@ -24,7 +24,11 @@
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
-    "extends": "react-app"
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ],
+    "parser": "@typescript-eslint/parser"
   },
   "browserslist": [
     ">0.2%",
