@@ -3,14 +3,12 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@finos/perspective": "^1.6.2",
-    "@finos/perspective-viewer": "^1.6.2",
     "@finos/perspective-viewer-d3fc": "^1.6.2",
     "@finos/perspective-viewer-datagrid": "^1.6.2",
     "@types/jest": "^23.3.13",
     "@types/node": "^10.12.19",
-    "@types/react": "^16.9.0",
-    "@types/react-dom": "^16.0.11",
+    "@types/react": "^16.14.60",
+    "@types/react-dom": "^16.9.24",
     "bootstrap": "^4.2.1",
     "puppeteer": "^1.19.0",
     "react": "^16.9.0",
@@ -33,6 +31,8 @@
     "not op_mini all"
   ],
   "devDependencies": {
+    "@finos/perspective": "^2.10.1",
+    "@finos/perspective-viewer": "^2.10.1",
     "awesome-typescript-loader": "^5.2.1",
     "source-map-loader": "^0.2.4",
     "typescript": "^3.2.4"
