@@ -26,6 +26,7 @@ class App extends Component<{}, IState> {
       showGraph : false,
     };
   }
+  
 
   /**
    * Render Graph react component with state.data parse as property data
