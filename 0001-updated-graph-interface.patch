@@ -1,0 +1,177 @@
+From d5f807c754cba48a22d0be7eaf4245887077ec2e Mon Sep 17 00:00:00 2001
+From: ADITHYA S NAIR <adithyasnair2021@gmail.com>
+Date: Wed, 31 Jul 2024 22:31:35 +0530
+Subject: [PATCH] updated graph interface
+
+updated graph interface
+---
+ package-lock.json | 19 ++++++++++++-------
+ src/App.tsx       | 37 +++++++++++++++++++------------------
+ src/Graph.tsx     | 17 +++++++++--------
+ 3 files changed, 40 insertions(+), 33 deletions(-)
+
+diff --git a/package-lock.json b/package-lock.json
+index 21b4315..648ad55 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -4392,9 +4392,9 @@
+       }
+     },
+     "node_modules/caniuse-lite": {
+-      "version": "1.0.30001373",
+-      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001373.tgz",
+-      "integrity": "sha512-pJYArGHrPp3TUqQzFYRmP/lwJlj8RCbVe3Gd3eJQkAV8SAC6b19XS9BjMvRdvaS8RMkaTN8ZhoHP6S1y8zzwEQ==",
++      "version": "1.0.30001645",
++      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001645.tgz",
++      "integrity": "sha512-GFtY2+qt91kzyMk6j48dJcwJVq5uTkk71XxE3RtScx7XWRLsO7bU44LOFkOZYR8w9YMS0UhPSYpN/6rAMImmLw==",
+       "funding": [
+         {
+           "type": "opencollective",
+@@ -4403,8 +4403,13 @@
+         {
+           "type": "tidelift",
+           "url": "https://tidelift.com/funding/github/npm/caniuse-lite"
++        },
++        {
++          "type": "github",
++          "url": "https://github.com/sponsors/ai"
+         }
+-      ]
++      ],
++      "license": "CC-BY-4.0"
+     },
+     "node_modules/capture-exit": {
+       "version": "1.2.0",
+@@ -23678,9 +23683,9 @@
+       }
+     },
+     "caniuse-lite": {
+-      "version": "1.0.30001373",
+-      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001373.tgz",
+-      "integrity": "sha512-pJYArGHrPp3TUqQzFYRmP/lwJlj8RCbVe3Gd3eJQkAV8SAC6b19XS9BjMvRdvaS8RMkaTN8ZhoHP6S1y8zzwEQ=="
++      "version": "1.0.30001645",
++      "resolved": "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001645.tgz",
++      "integrity": "sha512-GFtY2+qt91kzyMk6j48dJcwJVq5uTkk71XxE3RtScx7XWRLsO7bU44LOFkOZYR8w9YMS0UhPSYpN/6rAMImmLw=="
+     },
+     "capture-exit": {
+       "version": "1.2.0",
+diff --git a/src/App.tsx b/src/App.tsx
+index 0728518..39b8d7e 100755
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -6,8 +6,9 @@ import './App.css';
+ /**
+  * State declaration for <App />
+  */
+-interface IState {
++interface IState{
+   data: ServerRespond[],
++  showGraph : boolean,
+ }
+ 
+ /**
+@@ -17,32 +18,32 @@ interface IState {
+ class App extends Component<{}, IState> {
+   constructor(props: {}) {
+     super(props);
+-
+     this.state = {
+-      // data saves the server responds.
+-      // We use this state to parse data down to the child element (Graph) as element property
+       data: [],
++      showGraph: false,
+     };
+   }
+ 
+-  /**
+-   * Render Graph react component with state.data parse as property data
+-   */
+   renderGraph() {
+-    return (<Graph data={this.state.data}/>)
++    if(this.state.showGraph){
++      return (<Graph data={this.state.data}/>)
++    }
+   }
+-
+-  /**
+-   * Get new data from server and update the state with the new data
+-   */
+   getDataFromServer() {
+-    DataStreamer.getData((serverResponds: ServerRespond[]) => {
+-      // Update the state by creating a new array of data that consists of
+-      // Previous data in the state and the new data from server
+-      this.setState({ data: [...this.state.data, ...serverResponds] });
+-    });
++    let x = 0;
++    const interval = setInterval(() => {
++      DataStreamer.getData((serverResponds: ServerRespond[]) => {
++        this.setState({
++          data: serverResponds,
++          showGraph: true,
++        });
++      });
++      x++;
++      if(x>1000){
++        clearInterval(interval);
++      }
++    }, 100);
+   }
+-
+   /**
+    * Render the App react component
+    */
+diff --git a/src/Graph.tsx b/src/Graph.tsx
+index 3b2a7da..16402e5 100644
+--- a/src/Graph.tsx
++++ b/src/Graph.tsx
+@@ -1,11 +1,10 @@
+ import React, { Component } from 'react';
+ import { Table } from '@finos/perspective';
+ import { ServerRespond } from './DataStreamer';
++
++// Add the rest of your code here...
+ import './Graph.css';
+ 
+-/**
+- * Props declaration for <Graph />
+- */
+ interface IProps {
+   data: ServerRespond[],
+ }
+@@ -14,7 +13,7 @@ interface IProps {
+  * Perspective library adds load to HTMLElement prototype.
+  * This interface acts as a wrapper for Typescript compiler.
+  */
+-interface PerspectiveViewerElement {
++interface PerspectiveViewerElement extends HTMLElement {
+   load: (table: Table) => void,
+ }
+ 
+@@ -32,7 +31,7 @@ class Graph extends Component<IProps, {}> {
+ 
+   componentDidMount() {
+     // Get element to attach the table from the DOM.
+-    const elem: PerspectiveViewerElement = document.getElementsByTagName('perspective-viewer')[0] as unknown as PerspectiveViewerElement;
++    const elem = document.getElementsByTagName('perspective-viewer')[0] as unknown as PerspectiveViewerElement;
+ 
+     const schema = {
+       stock: 'string',
+@@ -45,10 +44,12 @@ class Graph extends Component<IProps, {}> {
+       this.table = window.perspective.worker().table(schema);
+     }
+     if (this.table) {
+-      // Load the `table` in the `<perspective-viewer>` DOM reference.
+-
+-      // Add more Perspective configurations here.
+       elem.load(this.table);
+++      elem.setAttribute('view', 'y_line');
+++      elem.setAttribute('column-pivots', '["stock"]');
+++      elem.setAttribute('row-pivots', '["timestamp"]');
+++      elem.setAttribute('columns', '["top_ask_price"]');
+++      elem.setAttribute('aggregates', '{"stock":"distinct count","top_ask_price":"avg","top_bid_price":"avg","timestamp":"distinct count"}');
+     }
+   }
+ 
+-- 
+2.37.3.windows.1
+
