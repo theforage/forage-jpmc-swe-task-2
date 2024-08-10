@@ -9,7 +9,7 @@ import { ServerResponse } from 'http';
  */
 interface IState {
   data: ServerRespond[],
-  showGraph:boolean,
+  showGraph: boolean,
 }
 
 /**
@@ -24,7 +24,7 @@ class App extends Component<{}, IState> {
       // data saves the server responds.
       // We use this state to parse data down to the child element (Graph) as element property
       data: [],
-      showGraph:false,
+      showGraph: false,
     };
   }
 
@@ -32,20 +32,22 @@ class App extends Component<{}, IState> {
    * Render Graph react component with state.data parse as property data
    */
   renderGraph() {
-    if(this.state.showGraph)
-    return (<Graph data={this.state.data}/>)
+    if (this.state.showGraph) {
+
+      return (<Graph data={this.state.data} />)
+    }
   }
 
   /**
    * Get new data from server and update the state with the new data
    */
   getDataFromServer() {
-    let x=0
-    const interval = setInterval(()=>{
-      DataStreamer.getData((ServerResponse:ServerRespond[])=>{
+    let x = 0
+    const interval = setInterval(() => {
+      DataStreamer.getData((ServerResponse: ServerRespond[]) => {
         this.setState({
-          data:ServerResponse,
-          showGraph :true,
+          data: ServerResponse,
+          showGraph: true,
         });
       });
     });
@@ -72,7 +74,7 @@ class App extends Component<{}, IState> {
             // As part of your task, update the getDataFromServer() function
             // to keep requesting the data every 100ms until the app is closed
             // or the server does not return anymore data.
-            onClick={() => {this.getDataFromServer()}}>
+            onClick={() => { this.getDataFromServer() }}>
             Start Streaming Data
           </button>
           <div className="Graph">
