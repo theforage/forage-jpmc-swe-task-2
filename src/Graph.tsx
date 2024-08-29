@@ -14,8 +14,8 @@ interface IProps {
  * Perspective library adds load to HTMLElement prototype.
  * This interface acts as a wrapper for Typescript compiler.
  */
-interface PerspectiveViewerElement {
-  load: (table: Table) => void,
+interface PerspectiveViewerElement extends HTMLElement {
+    load: (table: Table) => void,
 }
 
 /**
@@ -30,9 +30,9 @@ class Graph extends Component<IProps, {}> {
     return React.createElement('perspective-viewer');
   }
 
-  componentDidMount() {
-    // Get element to attach the table from the DOM.
-    const elem: PerspectiveViewerElement = document.getElementsByTagName('perspective-viewer')[0] as unknown as PerspectiveViewerElement;
+    componentDidMount() {
+        // Get element to attach the table from the DOM.
+        const elem = document.getElementsByTagName('perspective-viewer')[0] as unknown as PerspectiveViewerElement;
 
     const schema = {
       stock: 'string',
@@ -47,10 +47,17 @@ class Graph extends Component<IProps, {}> {
     if (this.table) {
       // Load the `table` in the `<perspective-viewer>` DOM reference.
 
-      // Add more Perspective configurations here.
-      elem.load(this.table);
+        // Add more Perspective configurations here.
+        elem.load(this.table);
+        elem.setAttribute("view", "y_line");
+        elem.setAttribute("column-pivots", '["stock"]');
+        elem.setAttribute("row_pivots", '["timestamp"]');
+        elem.setAttribute("columns", '["top_ask_price"]');
+        elem.setAttribute("aggregates",
+            '{"stock":"distinct_count", "top_ask_price":"avg", "top_bid_price":"avg", "timestamp":"distinct_count"}'
+        );
+      }
     }
-  }
 
   componentDidUpdate() {
     // Everytime the data props is updated, insert the data into Perspective table
