@@ -1,0 +1,92 @@
+From c2fc1c1eecd2526e984913028b4128cd5ca66320 Mon Sep 17 00:00:00 2001
+From: Mayur Tekale <mayurtekale7@gmail.com>
+Date: Sat, 7 Sep 2024 23:37:29 +0530
+Subject: [PATCH] update App.tsx
+
+---
+ src/App.tsx   | 19 ++++++++++++++++++-
+ src/Graph.tsx | 11 ++++++++++-
+ 2 files changed, 28 insertions(+), 2 deletions(-)
+
+diff --git a/src/App.tsx b/src/App.tsx
+index 0728518..7c11224 100755
+--- a/src/App.tsx
++++ b/src/App.tsx
+@@ -8,6 +8,7 @@ import './App.css';
+  */
+ interface IState {
+   data: ServerRespond[],
++  showGraph : boolean;
+ }
+ 
+ /**
+@@ -22,6 +23,7 @@ class App extends Component<{}, IState> {
+       // data saves the server responds.
+       // We use this state to parse data down to the child element (Graph) as element property
+       data: [],
++      showGraph : false,
+     };
+   }
+ 
+@@ -29,13 +31,28 @@ class App extends Component<{}, IState> {
+    * Render Graph react component with state.data parse as property data
+    */
+   renderGraph() {
+-    return (<Graph data={this.state.data}/>)
++    if(this.state.showGraph){
++      return (<Graph data={this.state.data}/>)
++    }
+   }
+ 
+   /**
+    * Get new data from server and update the state with the new data
+    */
+   getDataFromServer() {
++    let x = 0;
++    const interval = setInterval(() => {
++      DataStreamer.getData((serverResponds : ServerRespond[]) => {
++        this.setState({
++          data : serverResponds,
++          showGraph : true
++        });
++      });
++      x++;
++      if(x > 1000){
++        clearInterval(interval);
++      }
++    }, 100)
+     DataStreamer.getData((serverResponds: ServerRespond[]) => {
+       // Update the state by creating a new array of data that consists of
+       // Previous data in the state and the new data from server
+diff --git a/src/Graph.tsx b/src/Graph.tsx
+index 3b2a7da..cac2466 100644
+--- a/src/Graph.tsx
++++ b/src/Graph.tsx
+@@ -14,7 +14,7 @@ interface IProps {
+  * Perspective library adds load to HTMLElement prototype.
+  * This interface acts as a wrapper for Typescript compiler.
+  */
+-interface PerspectiveViewerElement {
++interface PerspectiveViewerElement extends HTMLElement {
+   load: (table: Table) => void,
+ }
+ 
+@@ -49,6 +49,15 @@ class Graph extends Component<IProps, {}> {
+ 
+       // Add more Perspective configurations here.
+       elem.load(this.table);
++      elem.setAttribute('view', 'y_line');
++      elem.setAttribute('column-pivotes', '["stock"]');
++      elem.setAttribute('row-pivotes', '["timestamp"]');
++      elem.setAttribute('columns', '["top_ask_price"]');
++      elem.setAttribute('aggregates',
++        `{"stock" : "distinct count",
++        "top_ask_price" : "avg",
++        "top_bid_price" : "avg",
++        "timestamp" : "distinct count"}` );
+     }
+   }
+ 
+-- 
+2.43.0.windows.1
+
