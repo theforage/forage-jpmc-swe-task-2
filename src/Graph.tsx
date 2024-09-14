@@ -24,7 +24,9 @@ interface PerspectiveViewerElement {
  */
 class Graph extends Component<IProps, {}> {
   // Perspective table
-  table: Table | undefined;
+  private table: Table | undefined;
+
+  private existingDataKeys: Set<string> = new Set();
 
   render() {
     return React.createElement('perspective-viewer');
@@ -44,30 +46,19 @@ class Graph extends Component<IProps, {}> {
     if (window.perspective && window.perspective.worker()) {
       this.table = window.perspective.worker().table(schema);
     }
-    if (this.table) {
-      // Load the `table` in the `<perspective-viewer>` DOM reference.
 
-      // Add more Perspective configurations here.
+    if (this.table) {
+      // Load the table into the `<perspective-viewer>` DOM reference.
       elem.load(this.table);
     }
   }
 
-  componentDidUpdate() {
-    // Everytime the data props is updated, insert the data into Perspective table
+  componentDidUpdate(prevProps: IProps) {
     if (this.table) {
-      // As part of the task, you need to fix the way we update the data props to
-      // avoid inserting duplicated entries into Perspective table again.
-      this.table.update(this.props.data.map((el: any) => {
-        // Format the data from ServerRespond to the schema
-        return {
-          stock: el.stock,
-          top_ask_price: el.top_ask && el.top_ask.price || 0,
-          top_bid_price: el.top_bid && el.top_bid.price || 0,
-          timestamp: el.timestamp,
-        };
-      }));
-    }
-  }
-}
+      const newEntries = this.props.data.filter((entry) => {
+        const key = `${entry.timestamp}-${entry.stock}`;
+        return !this.existingDataKeys.has(key);
+      });
 
-export default Graph;
+      if (newEntries.length > 0) {
+        /
